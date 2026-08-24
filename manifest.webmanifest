@@ -1,0 +1,9 @@
+{
+  "name": "PHOTO→3D",
+  "short_name": "PHOTO→3D",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#05090d",
+  "theme_color": "#05090d",
+  "lang": "zh-CN"
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05090d" />
+    <meta
+      name="description"
+      content="照片不上云，在浏览器里把一圈照片重建为可下载的 3D 模型。"
+    />
+    <title>PHOTO→3D · 本地照片重建</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="PHOTO 到 3D 首页">
+        <span>PHOTO</span><b>→</b><em>3D</em>
+      </a>
+      <div class="privacy-mark" aria-label="隐私说明">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.2 9-8 11-4.8-2-8-6-8-11V5l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+        <span>本地处理 · 隐私优先 · 免费使用</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="workbench" aria-label="照片重建工作台">
+        <div class="input-pane">
+          <div class="intro">
+            <h1>把一圈照片，<br />变成一个 3D 模型</h1>
+            <p>照片只在你的设备上处理 · 无需账号 · 断网可用</p>
+          </div>
+
+          <section class="capture-guide" aria-labelledby="guide-title">
+            <h2 id="guide-title">拍摄要点</h2>
+            <ol>
+              <li><b>01</b><span class="guide-icon orbit-icon" aria-hidden="true">◎</span><span>环绕一圈拍<br />12–24 张</span></li>
+              <li><b>02</b><span class="guide-icon" aria-hidden="true">▣</span><span>不要移动物体</span></li>
+              <li><b>03</b><span class="guide-icon" aria-hidden="true">◇</span><span>背景越干净<br />越好</span></li>
+              <li><b>04</b><span class="guide-icon" aria-hidden="true">⌁</span><span>补一张俯拍</span></li>
+            </ol>
+          </section>
+
+          <label id="dropzone" class="dropzone" for="photos">
+            <input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple />
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 32V8m0 0-8 8m8-8 8 8"/><path d="M9 28v10h30V28"/></svg>
+            <strong>拖入照片，或点此选择</strong>
+            <small>JPG · PNG · WEBP</small>
+          </label>
+          <p id="asset-status" class="asset-status" role="status">正在检查离线资源…</p>
+        </div>
+
+        <section class="preview-pane" aria-labelledby="preview-title">
+          <h2 id="preview-title">3D 预览</h2>
+          <div id="viewport" class="viewport">
+            <canvas id="preview" aria-label="可拖动旋转、滚轮缩放的 3D 模型预览"></canvas>
+            <div id="empty-preview" class="empty-preview">
+              <span class="empty-cube" aria-hidden="true">◇</span>
+              <strong>等待照片</strong>
+              <small>生成后可拖动旋转 · 滚轮缩放</small>
+            </div>
+            <div class="axis-labels" aria-hidden="true"><i>X</i><b>Y</b><em>Z</em></div>
+          </div>
+        </section>
+
+        <section class="process-pane" aria-label="重建进度与导出">
+          <div class="photo-strip-wrap">
+            <p id="photo-count">尚未添加照片</p>
+            <div id="photo-strip" class="photo-strip" aria-label="已添加照片"></div>
+          </div>
+
+          <div class="process-row">
+            <div class="progress-panel">
+              <ol id="stages" class="stages">
+                <li data-stage="cutout"><span>01</span><b>抠图</b></li>
+                <li data-stage="carve"><span>02</span><b>轮廓雕刻</b></li>
+                <li data-stage="mesh"><span>03</span><b>生成网格</b></li>
+                <li data-stage="color"><span>04</span><b>投射颜色</b></li>
+              </ol>
+              <div class="progress-track" aria-hidden="true"><i id="progress-bar"></i></div>
+              <div class="progress-copy">
+                <span id="status-text">等待照片</span>
+                <strong id="progress-text">0%</strong>
+              </div>
+            </div>
+
+            <aside class="export-panel" aria-labelledby="export-title">
+              <h2 id="export-title">下载模型</h2>
+              <div class="export-buttons">
+                <button type="button" data-export="glb" disabled>GLB</button>
+                <button type="button" data-export="obj" disabled>OBJ</button>
+                <button type="button" data-export="stl" disabled>STL</button>
+                <button type="button" data-export="ply" disabled>PLY</button>
+                <button type="button" data-export="3mf" disabled>3MF</button>
+              </div>
+              <p>已知局限：凹陷与内腔无法完整还原</p>
+            </aside>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
+

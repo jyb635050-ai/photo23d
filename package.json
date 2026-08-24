@@ -1,0 +1,15 @@
+{
+  "name": "photo23d",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "离线纯前端多视角轮廓雕刻 3D 重建",
+  "scripts": {
+    "bench": "node tools/bench.js",
+    "test:reverse": "node tools/reconstruct.js"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "3.7.6",
+    "isosurface": "1.0.0"
+  }
+}

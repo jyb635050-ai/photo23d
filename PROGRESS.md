@@ -1,0 +1,35 @@
+# PROGRESS
+
+- 目标：纯浏览器离线 visual hull，从 12–24 张环拍照片生成并下载通用 3D 网格；无账号、照片不上云。
+- 顺序：0 环境核验 → 1 标准数据/尺子冻结 → 2 纯 JS 内核达标 → 3 五格式导出 → 4 中文离线网页 → 5 GitHub Pages 上线。
+- 算法边界：几何内核只接收轮廓掩码数组；合成图阈值和真实照片 RMBG 是可替换前端。
+- 质量顺序：算得对 > 用得懂 > 好看 > 做得快；不得接在线 AI 或读取真值作弊。
+- 最大算法风险：128³ visual hull 的相机标定、坐标系与体素/投影边界误差会直接拉低 IoU。
+- 最大产品风险：RMBG 依赖约 44–88MB，首次离线缓存、移动端内存与错误提示必须实测。
+- 任务 0：Blender 5.1.2、Python 3.12.10、Node 24.19.0、uv 0.11.23、git 2.54、gh 登录均实测通过。
+- 任务 0：Blender 无头输出 `BLENDER_OK 5.1.2`；Playwright 本机 Chrome 输出 `PLAYWRIGHT_OK photo23d probe ok`。
+- 任务 0：webcad/cutout 初始 `git status --short` 均为空；transformers 本地包偏差已记入 BLOCKED.md。
+- 轮次：1/40；任务 0 完成，进入任务 1。
+- 轮次：2/40；任务 1 首跑失败：Blender 5.1 枚举仅接受 `BLENDER_EEVEE`，已据实修正；冻结前允许修尺子脚本。
+- 轮次：3/40；任务 1 第二次失败：Blender 5.1 Look 枚举不接受旧名，固定为 `Standard + None`，准备第 3 次。
+- 轮次：4/40；任务 1 生成成功：`beveled_cube/cylinder/suzanne/mug` 均 `images=24`，相机 JSON 均 24 views。
+- 任务 1 评分器自检：四物体真值对自身均 `IoU=1.000000`，`truth_odd_rows=0`。
+- 冻结 SHA-256 	ools/generate_reference.py: $g。
+- 冻结 SHA-256 	ools/score_iou.py: $s。
+- 任务 1 完成；以上两个脚本、四物体与 128³ 阈值从此冻结，不再修改。
+- 轮次：5/40；任务 2 首跑：cube 0.87 PASS / cylinder 0.91 PASS / Suzanne 0.89 PASS / mug 0.49 FAIL，整条验收失败 1/3。
+- 轮次：6/40；任务 2 第二次：cube 0.88 / cylinder 0.92 / Suzanne 0.92 PASS；mug 显示 0.50 但精度值仍 FAIL，累计 2/3。
+- 轮次：7/40；任务 2 第三次仍 FAIL：mug 退化到 0.49；同条验收连败 3 次，按规矩跳任务 3。
+- 回滚：统一阈值 160 比上一版差，已恢复 185；任务 2 当前最佳 mug 精确 `IoU=0.496435`，其余三项全 PASS。
+- 轮次：8/40；任务 3 正向验收一次通过：GLB/OBJ/STL/PLY/3MF 均由无头 Blender 导入，面数统一 75052。
+- 任务 3 反向验证通过：GLB 仅翻转首字节后输出 `GLB_CORRUPTION FAIL ... exit=2`。
+- 任务 3 完成，进入任务 4；任务 2 保留最佳结果待回访。
+- 轮次：9/40；任务 4 首跑 passed=2 failed=2 skipped=0：完整生成下载与断网通过；favicon 404、390px 断言失败，累计 1/3。
+- 轮次：10/40；任务 4 完成：全绿 `passed=4 failed=0 skipped=0`；模型改名红测为 `passed=0 failed=4` 且给出中文缺失路径，还原 44403226 字节后再全绿。
+- 任务 4 视觉对照：修复生成后仍显示“等待照片”；桌面双栏、390px 单栏、青/品红、中文层级、导出轨道与概念一致。
+- 轮次：11/40；任务 2 回访阈值 175：前三项 PASS，mug 显示 0.50 仍 FAIL；本序列累计 2/3。
+- 轮次：12/40；任务 2 回访第三次内孔扩张使 mug 退到 0.49，已回滚；本序列 3/3，跳任务 5。
+- 任务 2 当前最佳保留：cube 0.88 / cylinder 0.92 / Suzanne 0.92 PASS；mug 精确 0.496435 FAIL，见 BLOCKED.md。
+- 轮次：13/40；上线候选回归：网页 `passed=4 failed=0 skipped=0`，五格式面数均 75052；冻结哈希匹配，webcad/cutout 均干净。
+- 任务 5：已创建公开仓库 `https://github.com/jyb635050-ai/photo23d` 并配置 origin；尚未 push/Pages。
+- 轮次：14/40；首次 commit 因未配置作者身份失败；仅在本仓库设置 jyb635050-ai noreply 身份后重试，不改全局配置。
