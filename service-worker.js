@@ -1,4 +1,4 @@
-const CACHE = "photo23d-v5";
+const CACHE = "photo23d-v15";
 const CORE = [
   "./",
   "./index.html",

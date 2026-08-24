@@ -24,11 +24,18 @@ function classifyMaskSet(masks) {
   return "mixed";
 }
 
-function sampleMask(mask, u, v) {
+function sampleMask(mask, u, v, margin = 0) {
   const x = Math.floor(u);
   const y = Math.floor(v);
   if (x < 0 || x >= mask.width || y < 0 || y >= mask.height) return 0;
-  return mask.data[y * mask.width + x];
+  if (!mask.data[y * mask.width + x]) return 0;
+  if (margin <= 0) return 1;
+  const points = [[u - margin, v - margin], [u + margin, v - margin], [u - margin, v + margin], [u + margin, v + margin]];
+  return points.every(([px, py]) => {
+    const sx = Math.floor(px);
+    const sy = Math.floor(py);
+    return sx >= 0 && sx < mask.width && sy >= 0 && sy < mask.height && mask.data[sy * mask.width + sx];
+  }) ? 1 : 0;
 }
 
 function project(matrix, intrinsics, x, y, z) {

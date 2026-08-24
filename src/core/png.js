@@ -1,5 +1,5 @@
 import { inflateSync } from "node:zlib";
-import { expandInternalBackground } from "./mask-postprocess.js";
+import { closeMask } from "./mask-postprocess.js";
 
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
 
@@ -95,7 +95,7 @@ export function decodePng(buffer) {
   return { width, height, data: rgba };
 }
 
-export function thresholdSilhouette(image, channelThreshold = 185) {
+export function thresholdSilhouette(image, channelThreshold = 155) {
   const mask = new Uint8Array(image.width * image.height);
   for (let pixel = 0; pixel < mask.length; pixel += 1) {
     const offset = pixel * 4;
@@ -104,8 +104,9 @@ export function thresholdSilhouette(image, channelThreshold = 185) {
       image.data[offset + 1],
       image.data[offset + 2],
     );
-    mask[pixel] = image.data[offset + 3] > 8 && minimumChannel < channelThreshold ? 1 : 0;
+    const maximumChannel = Math.max(image.data[offset], image.data[offset + 1], image.data[offset + 2]);
+    mask[pixel] = image.data[offset + 3] > 8 && (minimumChannel < channelThreshold || maximumChannel - minimumChannel >= 50) ? 1 : 0;
   }
-  return { width: image.width, height: image.height, data: mask };
+  return closeMask({ width: image.width, height: image.height, data: mask });
 }
 

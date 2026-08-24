@@ -53,3 +53,43 @@ export function expandInternalBackground(mask, radius = 1) {
   }
   return { width, height, data: current };
 }
+
+/** Fill one-pixel silhouette notches without changing broad outlines. */
+export function closeMask(mask) {
+  const { width, height, data } = mask;
+  const dilated = new Uint8Array(data.length);
+  const closed = new Uint8Array(data.length);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let foreground = 0;
+      for (let dy = -1; dy <= 1 && !foreground; dy += 1) {
+        for (let dx = -1; dx <= 1; dx += 1) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height && data[ny * width + nx]) {
+            foreground = 1;
+            break;
+          }
+        }
+      }
+      dilated[y * width + x] = foreground;
+    }
+  }
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      let foreground = 1;
+      for (let dy = -1; dy <= 1 && foreground; dy += 1) {
+        for (let dx = -1; dx <= 1; dx += 1) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height || !dilated[ny * width + nx]) {
+            foreground = 0;
+            break;
+          }
+        }
+      }
+      closed[y * width + x] = foreground;
+    }
+  }
+  return { width, height, data: closed };
+}

@@ -1,11 +1,11 @@
 import * as THREE from "./vendor/three.module.js";
 import { exportAllFormats } from "./src/core/mesh-export.js";
-import { expandInternalBackground } from "./src/core/mask-postprocess.js";
+import { closeMask } from "./src/core/mask-postprocess.js";
 
 const MODEL_ID = "briaai/RMBG-1.4";
 const MODEL_URL = "./models/briaai/RMBG-1.4/onnx/model_quantized.onnx";
 const NORMALIZED_SIZE = 256;
-const SYNTHETIC_THRESHOLD = 185;
+const SYNTHETIC_THRESHOLD = 155;
 
 const dom = {
   input: document.querySelector("#photos"),
@@ -564,9 +564,11 @@ function thresholdSynthetic(imageData) {
   const mask = new Uint8Array(imageData.width * imageData.height);
   for (let index = 0; index < mask.length; index += 1) {
     const offset = index * 4;
-    mask[index] = Math.min(imageData.data[offset], imageData.data[offset + 1], imageData.data[offset + 2]) < SYNTHETIC_THRESHOLD ? 1 : 0;
+    const minimumChannel = Math.min(imageData.data[offset], imageData.data[offset + 1], imageData.data[offset + 2]);
+    const maximumChannel = Math.max(imageData.data[offset], imageData.data[offset + 1], imageData.data[offset + 2]);
+    mask[index] = minimumChannel < SYNTHETIC_THRESHOLD || maximumChannel - minimumChannel >= 50 ? 1 : 0;
   }
-  return { width: imageData.width, height: imageData.height, data: mask };
+  return closeMask({ width: imageData.width, height: imageData.height, data: mask });
 }
 
 async function loadSyntheticFixture(name = "beveled_cube") {
